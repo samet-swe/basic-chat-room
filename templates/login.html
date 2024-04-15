@@ -1,1 +1,19 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+    <form method="post" class="login">
+        <div>
+            <h1>Login</h1>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{username}}"/><br /><br />
+            <label for="room">Chatroom:</label>
+            <input type="text" id="room" name="room" value="{{room}}"/><br /><br />
+            <input type="submit" value="Enter chat" />
+        </div>
+    </form>
 
+    {% if error %}            <!-- If username and room are required, post error message informing user upon rejection by server -->
+    <ul>
+        <li>{{error}}</li>
+    </ul>
+    {% endif %}
+{% endblock %}

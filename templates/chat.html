@@ -1,1 +1,53 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<div class="chat_container">
+    <h1 id="room_name" style="margin-left:20px;">Chatroom: {{room}}</h1>
+    <h3 id="user" style="margin-left:20px;">Username: {{username}}</h3><br />
 
+    <div class="chat_window">
+        <div id="chat"></div>
+    </div>
+    <div class="enter_message">
+        <input type="text" id="message" class="chat_message" name="message" />
+        <input type="submit" class="submit_button" name="send" value="Send message" onclick="sendMessage()" />
+    </div>
+</div>
+    <script type="text/javascript">
+        var socket = io();
+
+        const messages = document.getElementById('chat')    /* Current contents of chat window */
+
+        const createMessage = (username, msg) => {          /* Add timestamp to message and construct HTML to post*/
+            const content = `
+            <div class='text'>
+                <span>
+                    <strong>${username}</strong>: ${msg}
+                </span>
+                <span class='muted'>
+                    ${new Date().toLocaleString()}
+                </span>
+            </div>
+            `
+            messages.innerHTML += content;                  /* Post message to chat window */
+        };
+
+        socket.on('message', (data) => {                    /* Handle messages received */
+            createMessage(data.username, data.message);
+        });
+
+        const sendMessage = () => {                         /* Function for sending messages to room */
+            const message = document.getElementById('message')
+
+            if (message.value == '') return;                /* If message to be sent is empty, return */
+                
+            socket.emit('message', { data: message.value }) /* Send message event with json data containing message */
+            message.value = '';
+        }
+    </script>
+
+    {% for msg in messages %}                               
+        <script type="text/javascript">                     /* Loop through all messages in room's recent message history and post them all */
+            createMessage('{{msg.username}}', '{{msg.message}}')
+        </script>
+    {% endfor %}
+{% endblock %}
